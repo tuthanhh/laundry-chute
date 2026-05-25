@@ -1,0 +1,12 @@
+key_file = ".config/key-example.json"
+root_id = "<your root id>"
+sheet_url = "<your sheet url>"
+worksheet = "<your worksheet>"
+download_dir = "downloads"
+
+[android]
+destination = "/sdcard/Android/data/com.Reflektone.AstroDX/files/levels/"
+
+[ios]
+id = "com.kumoumi.astrodx.a"
+mount_point = "./mnt"

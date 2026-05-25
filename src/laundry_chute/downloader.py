@@ -8,14 +8,14 @@ from tqdm import tqdm
 
 
 class DriveDownloader:
-    def __init__(self, key_file):
+    def __init__(self, key_file, root_id):
         SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
         creds = Credentials.from_service_account_file(key_file, scopes=SCOPES)
         self.service = build("drive", "v3", credentials=creds)
-        self.root_id = "1NiZ9rL19qKLqt0uNcP5tIqc0fUrksAPs"
+        self.root_id = root_id
 
     def get_folder_id(
-        self, root_id: str, version: str, song_name: str, variant: str | None = None
+        self, version: str, song_name: str, variant: str | None = None
     ) -> str:
         """
         Finds the ID of a song folder located inside a specific version folder.
@@ -31,12 +31,12 @@ class DriveDownloader:
 
         # Replacement for apostrophe
         song_name = song_name.replace("'", "\\'")
-        
+
         # Find the Version Folder (e.g., "PRiSM/ FESTiVAL/CiRCLE")
         # We search globally or in shared drives for this high-level folder
         version_query = (
             f"name contains '{version}' "
-            f"and '{root_id}' in parents "
+            f"and '{self.root_id}' in parents "
             f"and mimeType = 'application/vnd.google-apps.folder' "
             f"and trashed = false"
         )
@@ -68,7 +68,7 @@ class DriveDownloader:
         # I exclude charts which are utage
         query = (
             f"name contains '{song_name}' "
-            # f"and not name contains '['" 
+            # f"and not name contains '['"
             f"and '{version_id}' in parents "
             f"and mimeType = 'application/vnd.google-apps.folder' "
             f"and trashed = false"
@@ -88,24 +88,22 @@ class DriveDownloader:
 
         for folder in candidates:
             folder_name = folder["name"]
-                
+
             if variant:
                 # Check if folder explicitly says (DX) or (STD)
                 # Normalizes to ignore case: "(dx)" == "(DX)"
                 if f"({variant})" in folder_name.upper():
                     target_folder = folder
                     break
-               
+
             if song_name == folder_name:
                 target_folder = folder
                 break
 
-            
-
         # If we didn't find a specific match in the loop, default to the first candidate
         if not target_folder:
             candidates.sort(key=lambda x: len(x["name"]))
-            
+
             print(
                 f"Precise match failed. Defaulting to shortest match: {candidates[0]['name']}"
             )

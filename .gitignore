@@ -6,8 +6,9 @@ dist/
 wheels/
 *.egg-info
 
-# Code-generated file 
+# Code-generated file
 downloads
 # Virtual environments
 .venv
 key.json
+settings.toml
